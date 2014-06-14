@@ -1,3 +1,6 @@
+var fs = require('fs');
+var jsesc = require('jsesc');
+
 module.exports = function(grunt) {
 
   // Project configuration.
@@ -95,9 +98,16 @@ module.exports = function(grunt) {
   // Allows copying files
   grunt.loadNpmTasks('grunt-contrib-copy');
 
+  grunt.registerTask('compileTpl', function() {
+    var tpl = jsesc(fs.readFileSync('src/views/directives/snoozeapitpl.html', {encoding: 'utf8'}));
+    var directive = fs.readFileSync('src/scripts/directives/snoozeApi.js', {encoding: 'utf8'});
+    var processed = grunt.template.process((directive+''), {data: {snoozetpl: tpl}});
+    fs.writeFileSync('src/scripts/directives/snoozeApi.compiled.js', processed);
+  });
+
   // Default task(s).
   grunt.registerTask('default', ['bowerInstall']);
   grunt.registerTask('serve', ['bowerInstall', 'connect', 'watch']);
-  grunt.registerTask('build', ['uglify', 'cssmin', 'copy']);
+  grunt.registerTask('build', ['compileTpl', 'uglify', 'cssmin']);
 
 };
