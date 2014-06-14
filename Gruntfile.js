@@ -11,8 +11,17 @@ module.exports = function(grunt) {
     cssmin: {
       combine: {
         files: {
-          'build/styles.css': ['src/styles/**/*.css', 'src/styles/*.css']
+          'build/styles.css': ['src/styles/**/*.css', 'src/styles/*.css'],
+          'build/bootstrap.css': ['src/bower_components/bootstrap/dist/css/bootstrap.min.css', 'src/bower_components/bootstrap/dist/css/bootstrap-theme.min.css']
         }
+      }
+    },
+    copy: {
+      main: {
+        files: [
+          // includes files within path and its sub-directories
+          {expand: true, cwd: 'src/', src: ['views/**'], dest: 'build/'},
+        ]
       }
     },
     bowerInstall: {
@@ -83,9 +92,12 @@ module.exports = function(grunt) {
   // Reloads the server when files change
   grunt.loadNpmTasks('grunt-contrib-watch');
 
+  // Allows copying files
+  grunt.loadNpmTasks('grunt-contrib-copy');
+
   // Default task(s).
   grunt.registerTask('default', ['bowerInstall']);
   grunt.registerTask('serve', ['bowerInstall', 'connect', 'watch']);
-  grunt.registerTask('build', ['uglify', 'cssmin']);
+  grunt.registerTask('build', ['uglify', 'cssmin', 'copy']);
 
 };
