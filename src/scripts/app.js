@@ -1,1 +1,1 @@
-angular.module('snoozeAPI', ['ui.bootstrap']);
+angular.module('snoozeAPI');
