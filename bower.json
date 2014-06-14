@@ -1,6 +1,6 @@
 {
   "name": "snooze-api",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": ["build/scripts.js", "build/styles.css"],
   "dependencies": {
     "angular": "~1.2.17",
