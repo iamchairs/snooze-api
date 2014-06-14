@@ -1,0 +1,1 @@
+dist/ui-bootstrap-0.11.0.min.js

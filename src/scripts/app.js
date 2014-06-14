@@ -1,0 +1,1 @@
+angular.module('snoozeAPI', ['ui.bootstrap']);

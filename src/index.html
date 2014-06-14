@@ -1,0 +1,107 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="styles/main.css"/>		
+
+		<!-- bower:css -->
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+		<!-- endbower -->
+
+		<!-- bower:js -->
+		<script src="bower_components/jquery/dist/jquery.js"></script>
+		<script src="bower_components/angular/angular.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+		<script src="bower_components/underscore/underscore.js"></script>
+		<!-- endbower -->
+		<script src="bower_components/angular-ui-bootstrap/ui-bootstrap.js"></script>
+
+		<script src="scripts/app.js"></script>
+
+		<script src="scripts/controllers/APIRoutesCtrl.js"></script>
+		<script src="scripts/controllers/APIDocumentationCtrl.js"></script>
+
+		<script src="scripts/services/API.js"></script>
+	</head>
+	<body ng-app="snoozeAPI">
+		<div class='container'>
+			<div class="snooze-api-wrapper">
+				<div class="snooze-api-routes" ng-controller="APIRoutesCtrl">
+					<ul class="nav nav-heading">
+						<li><span>{{api.name}}</span>
+							<ul class="nav route-nav">
+								<li ng-repeat="(route, data) in routes" ng-click="selectRoute(route)" ng-class="{'active': selectedRoute === route}">
+									<div class='active-arrow'></div>
+									<span>/{{route}}</span>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="snooze-api-documentation" ng-controller="APIDocumentationCtrl">
+					<div class="snooze-documentation-padding">
+						<div class="snooze-documentation-row" ng-repeat="(route, data) in selectedRoute">
+							<div class="snooze-documentation-headline" ng-click="toggleOpen(data)">
+								<span class="snooze-route-type label"
+								ng-class="{'label-default': data.method === 'resource', 'label-primary': data.method === 'post', 'label-success': data.method === 'get', 'label-warning': data.method === 'put', 'label-danger': data.method === 'delete'}"
+								>{{data.method}}</span>
+								<span class="snooze-route-path">{{route}}</span>
+							</div>
+							<div class="snooze-documentation-content" ng-show="data.opened">
+								<div class="snooze-request" ng-show="!data.request">No Request Data</div>
+								<div class="snooze-request" ng-show="data.request">
+									<h3>Request</h3>
+									<div ng-repeat="(requestType, requestData) in data.request">
+										<h4>{{requestType}}</h4>
+										<table class="snooze-table">
+											<thead>
+												<th>Parameter</th>
+												<th>Description</th>
+												<th>Example</th>
+											</thead>
+											<tbody>
+												<tr ng-repeat="properties in getDTO(requestData)">
+													<td>{{properties.name}} ({{properties.type}})
+														<strong ng-show="properties.required">Required</strong>
+														<i ng-show="!properties.required">Optional</i>
+													</td>
+													<td>{{properties.description}}</td>
+													<td>{{properties.example}}</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+
+								<div class="snooze-response" ng-show="!data.response">No Response Data</div>
+								<div class="snooze-response" ng-show="data.response">
+									<h3>Response</h3>
+									<div ng-repeat="(responseCode, responseData) in data.response">
+										<div ng-show="!responseData">
+											No Data Sent
+										</div>
+										<div ng-show="responseData">
+											<h4>{{responseCode}} : {{responseCodes[responseCode]}}</h4>
+											<table class="snooze-table">
+												<thead>
+													<th>Parameter</th>
+													<th>Description</th>
+													<th>Example</th>
+												</thead>
+												<tbody>
+													<tr ng-repeat="properties in getDTO(responseData)">
+														<td>{{properties.name}} ({{properties.type}})</td>
+														<td>{{properties.description}}</td>
+														<td>{{properties.example}}</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
