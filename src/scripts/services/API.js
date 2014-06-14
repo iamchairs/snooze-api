@@ -14,6 +14,7 @@ angular.module('snoozeAPI').factory('API', ['$q', '$http', function($q, $http) {
 				_API[key] = angular.copy(mixed[key]);
 			}
 
+			_updateRoutes();
 			deferred.resolve();
 		} else if(typeof mixed === 'string') {
 			$http.get(mixed).success(function(Data) {
@@ -79,8 +80,6 @@ angular.module('snoozeAPI').factory('API', ['$q', '$http', function($q, $http) {
 
 		return null;
 	};
-
-	_updateRoutes();
 
 	return {
 		loadAPI: _loadAPI,
