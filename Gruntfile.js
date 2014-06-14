@@ -7,7 +7,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     uglify: {
       scripts: {
-        src: ['src/scripts/**/*.js', 'src/scripts/*.js', 'src/bower_components/underscore/underscore.js'],
+        src: ['src/scripts/**/*.js', 'src/scripts/*.js', '!src/scripts/directives/snoozeApi.js', 'src/bower_components/underscore/underscore.js'],
         dest: 'build/scripts.js'
       }
     },
