@@ -1,1 +1,1 @@
-angular.module('snoozeAPI');
+angular.module('snoozeAPI', []);
