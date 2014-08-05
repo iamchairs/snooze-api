@@ -7,13 +7,13 @@
 }
 
 .snooze-api-routes {
-	width: 15%;
+	width: 20%;
 	float: left;
 	padding-right: 1px;
 }
 
 .snooze-api-documentation {
-	width: 85%;
+	width: 80%;
 	float: left;
 	background-color: #fff;
 }
@@ -32,6 +32,7 @@
 .snooze-api-routes .nav.nav-heading > li {
 	background-color: #555;
 	color: #fff;
+	clear: both;
 }
 
 .snooze-api-routes .nav.nav-heading > li > span {
@@ -103,9 +104,26 @@
 	width: 120px;
 }
 
+.snooze-route-type.label {
+	vertical-align: top;
+}
+
 .snooze-route-path {
 	display: inline-block;
 	color: #555;
+	margin-left: 10px;
+}
+
+.snooze-request-description {
+	margin-top: 5px;
+	padding: 4px;
+	background-color: #fefefe;
+	border-radius: 2px;
+	font-size: 0.7em;
+}
+
+.snooze-request-description p {
+	margin: 0px;
 }
 
 .snooze-documentation-content {

@@ -1,7 +1,7 @@
-<div class="snooze-api-wrapper">
-	<div class="snooze-api-routes" ng-controller="APIRoutesCtrl">
+<div class="snooze-api-wrapper" ng-controller="APICtrl">
+	<div class="snooze-api-routes">
 		<ul class="nav nav-heading">
-			<li><span>{{api.name}}</span>
+			<li><span>{{api.name}} Routes</span>
 				<ul class="nav route-nav">
 					<li ng-repeat="(route, data) in routes" ng-click="selectRoute(route)" ng-class="{'active': selectedRoute === route}">
 						<div class='active-arrow'></div>
@@ -9,63 +9,88 @@
 					</li>
 				</ul>
 			</li>
+			<li><span>{{api.name}} DTOs</span>
+				<ul class="nav route-nav">
+					<li ng-repeat="dto in dtos" ng-click="selectDTO(dto.name)" ng-class="{'active': selectedDTO === dto.name}">
+						<div class='active-arrow'></div>
+						<span>{{dto.name}}</span>
+					</li>
+				</ul>
+			</li>
 		</ul>
 	</div>
 	<div class="snooze-api-documentation" ng-controller="APIDocumentationCtrl">
 		<div class="snooze-documentation-padding">
-			<div class="snooze-documentation-row" ng-repeat="(route, data) in selectedRoute">
+			<!-- Start Route -->
+			<div class="snooze-documentation-row" ng-repeat="data in selectedRoute">
 				<div class="snooze-documentation-headline" ng-click="toggleOpen(data)">
 					<span class="snooze-route-type label"
 					ng-class="{'label-default': data.method === 'resource', 'label-primary': data.method === 'post', 'label-success': data.method === 'get', 'label-warning': data.method === 'put', 'label-danger': data.method === 'delete'}"
 					>{{data.method}}</span>
-					<span class="snooze-route-path">{{route}}</span>
+					<span class="snooze-route-path">{{data.path}}
+						<div class="snooze-request snooze-request-description" ng-show="data.description">
+							<p ng-bind-html="data.description | linkDTO"></p>
+						</div>
+					</span>
 				</div>
 				<div class="snooze-documentation-content" ng-show="data.opened">
-					<div class="snooze-request" ng-show="!data.request">No Request Data</div>
+					<div class="snooze-request" ng-show="!data.request">
+						<p>No Request Data</p>
+					</div>
 					<div class="snooze-request" ng-show="data.request">
 						<h3>Request</h3>
 						<div ng-repeat="(requestType, requestData) in data.request">
-							<h4>{{requestType}}</h4>
+							<h4>{{requestType}} <span ng-if="requestData.length !== undefined">(<a ng-click="selectDTO(requestData)" ng-href="">{{requestData}}</a>)</span></h4>
 							<table class="snooze-table">
 								<thead>
 									<th>Parameter</th>
 									<th>Description</th>
-									<th>Example</th>
+									<th>Example/Default</th>
 								</thead>
 								<tbody>
 									<tr ng-repeat="properties in getDTO(requestData)">
-										<td>{{properties.name}} ({{properties.type}})
+										<td>{{properties.name}} (<span ng-bind-html="properties.type | linkDTO"></span>)
 											<strong ng-show="properties.required">Required</strong>
 											<i ng-show="!properties.required">Optional</i>
 										</td>
-										<td>{{properties.description}}</td>
-										<td>{{properties.example}}</td>
+										<td ng-bind-html="properties.description | linkDTO"></td>
+										<td>
+											<span ng-show="properties.example" ng-bind-html="properties.example | linkDTO"></span>
+											<span ng-show="properties.example"><strong>(example)</strong></span>
+											<span ng-show="!properties.example" ng-bind-html="properties.default | linkDTO"></span>
+											<span ng-show="!properties.example"><strong>(default)</strong></span>
+										</td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
 					</div>
 
-					<div class="snooze-response" ng-show="!data.response">No Response Data</div>
+					<div class="snooze-response" ng-show="data.response === undefined">No Response Data</div>
 					<div class="snooze-response" ng-show="data.response">
 						<h3>Response</h3>
 						<div ng-repeat="(responseCode, responseData) in data.response">
-							<div ng-show="!responseData">
-								No Data Sent
-							</div>
-							<div ng-show="responseData">
+							<div>
 								<h4>{{responseCode}} : {{responseCodes[responseCode]}}</h4>
-								<table class="snooze-table">
+								<table ng-show="responseData" class="snooze-table">
 									<thead>
 										<th>Parameter</th>
 										<th>Description</th>
-										<th>Example</th>
+										<th>Example/Default</th>
 									</thead>
 									<tbody>
 										<tr ng-repeat="properties in getDTO(responseData)">
-											<td>{{properties.name}} ({{properties.type}})</td>
-											<td>{{properties.description}}</td>
-											<td>{{properties.example}}</td>
+											<td>
+												<span ng-bind-html="properties.name"></span>
+												(<span ng-bind-html="properties.type | linkDTO"></span>)
+											</td>
+											<td ng-bind-html="properties.description | linkDTO"></td>
+											<td>
+												<span ng-show="properties.example" ng-bind-html="properties.example | linkDTO"></span>
+												<span ng-show="properties.example"><strong>(example)</strong></span>
+												<span ng-show="!properties.example" ng-bind-html="properties.default | linkDTO"></span>
+												<span ng-show="!properties.example"><strong>(default)</strong></span>
+											</td>
 										</tr>
 									</tbody>
 								</table>
@@ -74,6 +99,40 @@
 					</div>
 				</div>
 			</div>
+			<!-- End Route -->
+
+			<!-- Start DTO -->
+			<div class="snooze-documentation-row" ng-show="selectedDTO.dto">
+				<div class="snooze-documentation-headline">{{selectedDTO.dto.name}}</div>
+				<div class="snooze-documentation-content">
+					<h4>Properties</h4>
+					<div class="snooze-response">
+						<table class="snooze-table">
+							<thead>
+								<th>Parameter</th>
+								<th>Type</th>
+								<th>Description</th>
+								<th>Example</th>
+								<th>Default</th>
+							</thead>
+							<tbody>
+								<tr ng-repeat="property in selectedDTO.dto.properties">
+									<td>{{property.name}}
+										<strong ng-show="property.required">Required</strong>
+										<i ng-show="!property.required">Optional</i>
+									</td>
+									<td ng-bind-html="property.type | linkDTO"></td>
+									<td ng-bind-html="property.description | linkDTO"></td>
+									<td ng-bind-html="property.example | linkDTO"></td>
+									<td ng-bind-html="property.default | linkDTO"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- End DTO -->
+
 		</div>
 	</div>
 </div>

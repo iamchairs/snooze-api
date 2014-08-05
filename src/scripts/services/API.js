@@ -2,11 +2,15 @@ angular.module('snoozeAPI').factory('API', ['$q', '$http', function($q, $http) {
 
 	_API = {};
 
-	var _name = 'snooze API';
+	var _name = '';
 	var _routes = {};
-	var _selectedRoute = {};
+	var _dtos = [];
+	var _selectedRoute = [];
+	var _selectedDTO = {
+		dto: null
+	};
 
-	_loadAPI = function(mixed) {
+	var _loadAPI = function(mixed) {
 		var deferred = $q.defer();
 
 		if(typeof mixed === 'object') {
@@ -14,7 +18,9 @@ angular.module('snoozeAPI').factory('API', ['$q', '$http', function($q, $http) {
 				_API[key] = angular.copy(mixed[key]);
 			}
 
+			_updateMeta();
 			_updateRoutes();
+			_updateDTOs();
 			deferred.resolve();
 		} else if(typeof mixed === 'string') {
 			$http.get(mixed).success(function(Data) {
@@ -25,16 +31,24 @@ angular.module('snoozeAPI').factory('API', ['$q', '$http', function($q, $http) {
 		return deferred.promise;
 	};
 
-	_getAPI = function() {
+	var _getAPI = function() {
 		return _API;
 	};
 
-	_getRoutes = function() {
+	var _getRoutes = function() {
 		return _routes;
+	};
+
+	var _getDTOs = function() {
+		return _dtos;
 	};
 
 	var _getName = function() {
 		return _name;
+	};
+
+	var _updateMeta = function() {
+		_name = _API['module'];
 	};
 
 	var _updateRoutes = function() {
@@ -55,22 +69,62 @@ angular.module('snoozeAPI').factory('API', ['$q', '$http', function($q, $http) {
 		});
 	};
 
+	var _updateDTOs = function() {
+		_dtos.splice(0);
+
+		var _unsorted = [];
+
+		_.each(_API.dtos, function(dto) {
+			_unsorted.push(dto);
+		});
+
+		_unsorted = _.sortBy(_unsorted, function(_dto) {
+			return _dto.name;
+		});
+
+		_.each(_unsorted, function(_dto) {
+			_dtos.push(_dto);
+		});
+	};
+
 	var _selectRoute = function(rt) {
-		for(var key in _selectedRoute) {
-			delete _selectedRoute[key];
-		}
+		_selectedRoute.splice(0);
+		var _routes = [];
 
 		_.each(_API.routes, function(route) {
 			var parts = route.path.split('/');
 			var base = parts[1];
 			if(base === rt) {
-				_selectedRoute[route.path] = route;
+				_routes.push(route);
+			}
+		});
+
+		_routes = _.sortBy(_routes, function(_route) {
+			return _route.path;
+		});
+
+		_.each(_routes, function(_route) {
+			_selectedRoute.push(_route);
+		});
+	};
+
+	var _selectDTO = function(dto) {
+		_selectedDTO.dto = null;
+		_selectedRoute.splice(0);
+
+		_.each(_API.dtos, function(d) {
+			if(d.name === dto) {
+				_selectedDTO.dto = d;
 			}
 		});
 	};
 
 	var _getSelectedRoute = function() {
 		return _selectedRoute;
+	};
+
+	var _getSelecedDTO = function() {
+		return _selectedDTO;
 	};
 
 	var _getDTO = function(nm) {
@@ -86,8 +140,11 @@ angular.module('snoozeAPI').factory('API', ['$q', '$http', function($q, $http) {
 		getAPI: _getAPI,
 		getName: _getName,
 		getRoutes: _getRoutes,
+		getDTOs: _getDTOs,
 		selectRoute: _selectRoute,
+		selectDTO: _selectDTO,
 		getSelectedRoute: _getSelectedRoute,
+		getSelectedDTO: _getSelecedDTO,
 		getDTO: _getDTO
 	};
 }]);

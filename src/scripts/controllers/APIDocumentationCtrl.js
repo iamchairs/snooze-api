@@ -1,5 +1,6 @@
 angular.module('snoozeAPI').controller('APIDocumentationCtrl', ['$scope', 'API', function($scope, API) {
 	$scope.selectedRoute = API.getSelectedRoute();
+	$scope.selectedDTO = API.getSelectedDTO();
 	$scope.responseCodes = {
 		100: 'Continue',
 		101: 'Switching Protocols',

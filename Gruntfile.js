@@ -67,6 +67,7 @@ module.exports = function(grunt) {
       },
       html: {
         files: ['src/index.html', 'src/views/**/*.html', 'src/views/*.html'],
+        tasks: ['compileTpl'],
         options: {
           livereload: true
         }
